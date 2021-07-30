@@ -9,7 +9,7 @@ import static org.hamcrest.Matchers.containsString;
 
 import beans.TrelloBoardResponse;
 import core.TrelloProperties;
-import core.DataProvidersBoard;
+import core.BoardsData;
 import java.util.List;
 import org.hamcrest.Matchers;
 import org.testng.annotations.AfterMethod;
@@ -39,9 +39,9 @@ public class TrelloApiTests extends TrelloProperties {
         boardId = result.getId();
     }
 
-    // TEST 1
+    // TEST 1: Check that default board description is empty
     @Test(groups = {"groupToDeleteBoardAfterTestStep"})
-    public void checkThatDefaultBoardDescriptionIsEmpty() {
+    public void checkEmptinessOfDefaultBoardDescription() {
         TrelloBoardResponse result = getBoardResponse(
             requestBuilder()
                 .buildRequest()
@@ -52,10 +52,10 @@ public class TrelloApiTests extends TrelloProperties {
         assertThat("Default board description is not empty", result.getDesc(), Matchers.blankOrNullString());
     }
 
-    // TEST 2
+    // TEST 2: Change board background to correct value and check color in response
     @Test(groups = {"groupToDeleteBoardAfterTestStep"},
-          dataProviderClass = DataProvidersBoard.class, dataProvider = "correctColors")
-    public void changeBoardBackgroundToCorrectValueAndCheckColorInResponse(String color) {
+          dataProviderClass = BoardsData.class, dataProvider = "correctColors")
+    public void checkCorrectBoardBackgrounds(String color) {
         TrelloBoardResponse result = getBoardResponse(
             requestBuilder()
                 .setBackground(color)
@@ -68,10 +68,10 @@ public class TrelloApiTests extends TrelloProperties {
             result.getPrefs().getBackground(), Matchers.is(color));
     }
 
-    // TEST 3
+    // TEST 3: Change board background to incorrect value and check response
     @Test(groups = {"groupToDeleteBoardAfterTestStep"},
-          dataProviderClass = DataProvidersBoard.class, dataProvider = "incorrectColors")
-    public void changeBoardBackgroundToIncorrectValueAndCheckResponse(String color) {
+          dataProviderClass = BoardsData.class, dataProvider = "incorrectColors")
+    public void checkIncorrectBoardBackgrounds(String color) {
         TrelloBoardResponse result = getBoardResponse(
             requestBuilder()
                 .setBackground(color)
@@ -80,15 +80,15 @@ public class TrelloApiTests extends TrelloProperties {
                 .then().assertThat()
                 .spec(badResponseSpecification())
                 .and()
-                .body(Matchers.allOf(containsString(properties.getProperty(INCORRECT_BACKGROUND_MESSAGE)),
-                    containsString(properties.getProperty(ERROR_MESSAGE))))
+                .body(Matchers.allOf(containsString(testdataProperties.getProperty(INCORRECT_BACKGROUND_MESSAGE)),
+                    containsString(testdataProperties.getProperty(ERROR_MESSAGE))))
                 .extract().response());
     }
 
-    // TEST 4
+    // TEST 4: Change board description to value of correct length and check description in response
     @Test(groups = {"groupToDeleteBoardAfterTestStep"},
-          dataProviderClass = DataProvidersBoard.class, dataProvider = "descriptionsWithCorrectLength")
-    public void changeBoardDescriptionToValueOfCorrectLengthAndCheckDescriptionInResponse(String description) {
+          dataProviderClass = BoardsData.class, dataProvider = "descriptionsWithCorrectLength")
+    public void checkCorrectDescriptionLength(String description) {
         TrelloBoardResponse result = getBoardResponse(
             requestBuilder()
                 .setDescription(description)
@@ -101,9 +101,9 @@ public class TrelloApiTests extends TrelloProperties {
             result.getDesc(), Matchers.is(description));
     }
 
-    // TEST 5
+    // TEST 5: Check the possibility to create boards with the same names
     @Test(groups = {"groupToDeleteBoardAfterTestStep"})
-    public void checkThePossibilityToCreateBoardsWithTheSameNames() {
+    public void checkIdenticalBoardNames() {
         TrelloBoardResponse result = getBoardResponse(
             requestBuilder()
                 .buildRequest()
@@ -112,7 +112,7 @@ public class TrelloApiTests extends TrelloProperties {
                 .spec(goodResponseSpecification())
                 .extract().response());
         assertThat("The name of first board is not equal to assigned name",
-            result.getName(), Matchers.is(properties.getProperty(BOARD_NAME)));
+            result.getName(), Matchers.is(testdataProperties.getProperty(BOARD_NAME)));
 
         // Create second board:
         TrelloBoardResponse result2 = getBoardResponse(
@@ -124,7 +124,7 @@ public class TrelloApiTests extends TrelloProperties {
                 .extract().response());
         String secondBoardId = result2.getId();
         assertThat("The name of second board is not equal to assigned name",
-            result2.getName(), Matchers.is(properties.getProperty(BOARD_NAME)));
+            result2.getName(), Matchers.is(testdataProperties.getProperty(BOARD_NAME)));
 
         // Delete second board:
         requestBuilder()
@@ -132,9 +132,9 @@ public class TrelloApiTests extends TrelloProperties {
             .sendRequestToDeleteBoard(secondBoardId);
     }
 
-    // TEST 6
+    // TEST 6: Check that default board is private and that only members have an access
     @Test(groups = {"groupToDeleteBoardAfterTestStep"})
-    public void checkThatDefaultBoardIsMembersPrivate() {
+    public void checkPrivacyOfDefaultBoard() {
         TrelloBoardResponse result = getBoardResponse(
             requestBuilder()
                 .buildRequest()
@@ -149,9 +149,9 @@ public class TrelloApiTests extends TrelloProperties {
             permissionsFields, contains("private", "members", "members"));
     }
 
-    // TEST 7
+    // TEST 7: Check that deleted board is missing in response
     @Test
-    public void checkThatDeletedBoardIsMissingInResponse() {
+    public void checkBoardIsDeleted() {
         // Delete board:
         requestBuilder()
             .buildRequest()
@@ -162,12 +162,12 @@ public class TrelloApiTests extends TrelloProperties {
             .sendRequestToUpdateBoard(boardId)
             .then().assertThat()
             .spec(resourceNotFoundResponseSpecification())
-            .body(Matchers.containsString(properties.getProperty(MISSING_RESOURCE_MESSAGE)));
+            .body(Matchers.containsString(testdataProperties.getProperty(MISSING_RESOURCE_MESSAGE)));
     }
 
-    // TEST 8
+    // TEST 8: Check that board name in response is consistent with board mame in request
     @Test(groups = {"groupToDeleteBoardAfterTestStep"})
-    public void checkThatBoardNameIsConsistentWithTheNameInRequest() {
+    public void checkBoardName() {
         TrelloBoardResponse result = getBoardResponse(
             requestBuilder()
                 .buildRequest()
@@ -176,15 +176,15 @@ public class TrelloApiTests extends TrelloProperties {
                 .spec(goodResponseSpecification())
                 .extract().response());
         assertThat("Board name is not consistent with requested name",
-            result.getName(), Matchers.is(properties.getProperty(BOARD_NAME)));
+            result.getName(), Matchers.is(testdataProperties.getProperty(BOARD_NAME)));
     }
 
-    // TEST 9
+    // TEST 9: Check that public comment options are disabled with private permission level
     @Test(groups = {"groupToDeleteBoardAfterTestStep"},
-          dataProviderClass = DataProvidersBoard.class, dataProvider = "whoCanCommentCardsOnTheBoard-publicOptions")
-    public void checkThatPublicCommentOptionsAreDisabledWithPrivatePermissionLevel(String comments) {
+          dataProviderClass = BoardsData.class, dataProvider = "whoCanCommentCardsOnTheBoard-publicOptions")
+    public void checkPublicCommentOptionsWithPrivatePermission(String comments) {
         requestBuilder()
-            .setPermissions(properties.getProperty(PRIVATE_PERMISSION_LEVEL))
+            .setPermissions(testdataProperties.getProperty(PRIVATE_PERMISSION_LEVEL))
             .setOptionWhoCanCommentCardBoard(comments)
             .buildRequest()
             .sendRequestToUpdateBoard(boardId)
@@ -192,10 +192,10 @@ public class TrelloApiTests extends TrelloProperties {
             .statusCode(400);
     }
 
-    // TEST 10
+    // TEST 10: Check that all permission levels are enabled and correct permission status is returned in response
     @Test(groups = {"groupToDeleteBoardAfterTestStep"},
-          dataProviderClass = DataProvidersBoard.class, dataProvider = "permissionLevels")
-    public void checkThatAllPermissionLevelsAreEnabledAndCorrectPermissionStatusIsReturnedInResponse(
+          dataProviderClass = BoardsData.class, dataProvider = "permissionLevels")
+    public void checkBoardPermissionLevels(
         String permissions) {
         TrelloBoardResponse result = getBoardResponse(
             requestBuilder()
@@ -216,4 +216,3 @@ public class TrelloApiTests extends TrelloProperties {
             .sendRequestToDeleteBoard(boardId);
     }
 }
-

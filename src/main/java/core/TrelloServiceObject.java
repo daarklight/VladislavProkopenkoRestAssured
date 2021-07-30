@@ -75,8 +75,8 @@ public class TrelloServiceObject extends TrelloProperties {
         return RestAssured
             .given(requestSpecification()).log().all()
             .queryParams(parameters)
-            .queryParams(BOARD_NAME, properties.getProperty(BOARD_NAME))
-            .request(requestMethod, properties.getProperty(URL))
+            .queryParams(BOARD_NAME, testdataProperties.getProperty(BOARD_NAME))
+            .request(requestMethod, testdataProperties.getProperty(URL))
             .prettyPeek();
     }
 
@@ -84,14 +84,14 @@ public class TrelloServiceObject extends TrelloProperties {
         return RestAssured
             .given(requestSpecification()).log().all()
             .queryParams(parameters)
-            .request(Method.PUT, properties.getProperty(URL) + boardId)
+            .request(Method.PUT, testdataProperties.getProperty(URL) + boardId)
             .prettyPeek();
     }
 
     public Response sendRequestToDeleteBoard(String boardId) {
         return RestAssured
             .given(requestSpecification()).log().all()
-            .request(Method.DELETE, properties.getProperty(URL) + boardId)
+            .request(Method.DELETE, testdataProperties.getProperty(URL) + boardId)
             .prettyPeek();
     }
 
@@ -106,8 +106,8 @@ public class TrelloServiceObject extends TrelloProperties {
         return new RequestSpecBuilder()
             .setContentType(ContentType.JSON)
             .setAccept(ContentType.JSON)
-            .addQueryParam(TRELLO_KEY, properties.getProperty(TRELLO_KEY))
-            .addQueryParam(TRELLO_TOKEN, properties.getProperty(TRELLO_TOKEN))
+            .addQueryParam(TRELLO_KEY, credentialProperties.getProperty(TRELLO_KEY))
+            .addQueryParam(TRELLO_TOKEN, credentialProperties.getProperty(TRELLO_TOKEN))
             .build();
     }
 
@@ -135,4 +135,3 @@ public class TrelloServiceObject extends TrelloProperties {
             .build();
     }
 }
-
