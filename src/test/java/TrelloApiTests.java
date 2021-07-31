@@ -33,7 +33,7 @@ public class TrelloApiTests {
     @BeforeClass
     public void setUp() {
         TrelloProperties trelloProperties = new TrelloProperties();
-        testdataProperties = trelloProperties.testdataProperties;
+        testdataProperties = trelloProperties.TESTDATA_PROPERTIES;
     }
 
     @BeforeMethod

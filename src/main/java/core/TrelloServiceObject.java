@@ -1,7 +1,7 @@
 package core;
 
-import static core.TrelloProperties.credentialProperties;
-import static core.TrelloProperties.testdataProperties;
+import static core.TrelloProperties.CREDENTIAL_PROPERTIES;
+import static core.TrelloProperties.TESTDATA_PROPERTIES;
 import static org.hamcrest.Matchers.lessThan;
 
 import beans.TrelloBoardResponse;
@@ -77,8 +77,8 @@ public class TrelloServiceObject {
         return RestAssured
             .given(requestSpecification()).log().all()
             .queryParams(parameters)
-            .queryParams(BOARD_NAME, testdataProperties.getProperty(BOARD_NAME))
-            .request(requestMethod, testdataProperties.getProperty(URL))
+            .queryParams(BOARD_NAME, TESTDATA_PROPERTIES.getProperty(BOARD_NAME))
+            .request(requestMethod, TESTDATA_PROPERTIES.getProperty(URL))
             .prettyPeek();
     }
 
@@ -86,14 +86,14 @@ public class TrelloServiceObject {
         return RestAssured
             .given(requestSpecification()).log().all()
             .queryParams(parameters)
-            .request(Method.PUT, testdataProperties.getProperty(URL) + boardId)
+            .request(Method.PUT, TESTDATA_PROPERTIES.getProperty(URL) + boardId)
             .prettyPeek();
     }
 
     public Response sendRequestToDeleteBoard(String boardId) {
         return RestAssured
             .given(requestSpecification()).log().all()
-            .request(Method.DELETE, testdataProperties.getProperty(URL) + boardId)
+            .request(Method.DELETE, TESTDATA_PROPERTIES.getProperty(URL) + boardId)
             .prettyPeek();
     }
 
@@ -108,8 +108,8 @@ public class TrelloServiceObject {
         return new RequestSpecBuilder()
             .setContentType(ContentType.JSON)
             .setAccept(ContentType.JSON)
-            .addQueryParam(TRELLO_KEY, credentialProperties.getProperty(TRELLO_KEY))
-            .addQueryParam(TRELLO_TOKEN, credentialProperties.getProperty(TRELLO_TOKEN))
+            .addQueryParam(TRELLO_KEY, CREDENTIAL_PROPERTIES.getProperty(TRELLO_KEY))
+            .addQueryParam(TRELLO_TOKEN, CREDENTIAL_PROPERTIES.getProperty(TRELLO_TOKEN))
             .build();
     }
 
