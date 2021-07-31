@@ -1,3 +1,6 @@
+import static constants.AccessStatuses.MEMBERS_ACCESS;
+import static constants.AccessStatuses.PRIVATE_ACCESS;
+import static core.TrelloProperties.TEST_DATA_PROPERTIES;
 import static core.TrelloServiceObject.badResponseSpecification;
 import static core.TrelloServiceObject.getBoardResponse;
 import static core.TrelloServiceObject.goodResponseSpecification;
@@ -8,13 +11,10 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
 
 import beans.TrelloBoardResponse;
-import core.TrelloProperties;
 import core.BoardsData;
 import java.util.List;
-import java.util.Properties;
 import org.hamcrest.Matchers;
 import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.testng.collections.Lists;
@@ -28,13 +28,6 @@ public class TrelloApiTests {
     private static final String PRIVATE_PERMISSION_LEVEL = "privatePermissionLevel";
 
     private String boardId;
-    private Properties testdataProperties;
-
-    @BeforeClass
-    public void setUp() {
-        TrelloProperties trelloProperties = new TrelloProperties();
-        testdataProperties = trelloProperties.TESTDATA_PROPERTIES;
-    }
 
     @BeforeMethod
     public void createBoard() {
@@ -90,8 +83,8 @@ public class TrelloApiTests {
                 .spec(badResponseSpecification())
                 .and()
                 .body(Matchers.allOf(
-                    containsString(testdataProperties.getProperty(INCORRECT_BACKGROUND_MESSAGE)),
-                    containsString(testdataProperties.getProperty(ERROR_MESSAGE))))
+                    containsString(TEST_DATA_PROPERTIES.getProperty(INCORRECT_BACKGROUND_MESSAGE)),
+                    containsString(TEST_DATA_PROPERTIES.getProperty(ERROR_MESSAGE))))
                 .extract().response());
     }
 
@@ -122,7 +115,7 @@ public class TrelloApiTests {
                 .spec(goodResponseSpecification())
                 .extract().response());
         assertThat("The name of first board is not equal to assigned name",
-            result.getName(), Matchers.is(testdataProperties.getProperty(BOARD_NAME)));
+            result.getName(), Matchers.is(TEST_DATA_PROPERTIES.getProperty(BOARD_NAME)));
 
         // Create second board:
         TrelloBoardResponse result2 = getBoardResponse(
@@ -134,7 +127,7 @@ public class TrelloApiTests {
                 .extract().response());
         String secondBoardId = result2.getId();
         assertThat("The name of second board is not equal to assigned name",
-            result2.getName(), Matchers.is(testdataProperties.getProperty(BOARD_NAME)));
+            result2.getName(), Matchers.is(TEST_DATA_PROPERTIES.getProperty(BOARD_NAME)));
 
         // Delete second board:
         requestBuilder()
@@ -156,7 +149,7 @@ public class TrelloApiTests {
         List<String> permissionsFields = Lists.newArrayList(result.getPrefs().getPermissionLevel(),
             result.getPrefs().getComments(), result.getPrefs().getInvitations());
         assertThat("Default board is not membersPrivate",
-            permissionsFields, contains("private", "members", "members"));
+            permissionsFields, contains(PRIVATE_ACCESS, MEMBERS_ACCESS, MEMBERS_ACCESS));
     }
 
     // TEST 7: Check that deleted board is missing in response
@@ -172,7 +165,7 @@ public class TrelloApiTests {
             .sendRequestToUpdateBoard(boardId)
             .then().assertThat()
             .spec(resourceNotFoundResponseSpecification())
-            .body(Matchers.containsString(testdataProperties.getProperty(MISSING_RESOURCE_MESSAGE)));
+            .body(Matchers.containsString(TEST_DATA_PROPERTIES.getProperty(MISSING_RESOURCE_MESSAGE)));
     }
 
     // TEST 8: Check that board name in response is consistent with board mame in request
@@ -186,7 +179,7 @@ public class TrelloApiTests {
                 .spec(goodResponseSpecification())
                 .extract().response());
         assertThat("Board name is not consistent with requested name",
-            result.getName(), Matchers.is(testdataProperties.getProperty(BOARD_NAME)));
+            result.getName(), Matchers.is(TEST_DATA_PROPERTIES.getProperty(BOARD_NAME)));
     }
 
     // TEST 9: Check that public comment options are disabled with private permission level
@@ -194,7 +187,7 @@ public class TrelloApiTests {
           dataProviderClass = BoardsData.class, dataProvider = "whoCanCommentCardsOnTheBoard-publicOptions")
     public void checkPublicCommentOptionsWithPrivatePermission(String comments) {
         requestBuilder()
-            .setPermissions(testdataProperties.getProperty(PRIVATE_PERMISSION_LEVEL))
+            .setPermissions(TEST_DATA_PROPERTIES.getProperty(PRIVATE_PERMISSION_LEVEL))
             .setOptionWhoCanCommentCardBoard(comments)
             .buildRequest()
             .sendRequestToUpdateBoard(boardId)

@@ -1,7 +1,7 @@
 package core;
 
 import static core.TrelloProperties.CREDENTIAL_PROPERTIES;
-import static core.TrelloProperties.TESTDATA_PROPERTIES;
+import static core.TrelloProperties.TEST_DATA_PROPERTIES;
 import static org.hamcrest.Matchers.lessThan;
 
 import beans.TrelloBoardResponse;
@@ -27,7 +27,6 @@ public class TrelloServiceObject {
     private static final String URL = "url";
 
     private Method requestMethod;
-
     private Map<String, String> parameters;
 
     private TrelloServiceObject(Map<String, String> parameters, Method method) {
@@ -77,8 +76,8 @@ public class TrelloServiceObject {
         return RestAssured
             .given(requestSpecification()).log().all()
             .queryParams(parameters)
-            .queryParams(BOARD_NAME, TESTDATA_PROPERTIES.getProperty(BOARD_NAME))
-            .request(requestMethod, TESTDATA_PROPERTIES.getProperty(URL))
+            .queryParams(BOARD_NAME, TEST_DATA_PROPERTIES.getProperty(BOARD_NAME))
+            .request(requestMethod, TEST_DATA_PROPERTIES.getProperty(URL))
             .prettyPeek();
     }
 
@@ -86,14 +85,14 @@ public class TrelloServiceObject {
         return RestAssured
             .given(requestSpecification()).log().all()
             .queryParams(parameters)
-            .request(Method.PUT, TESTDATA_PROPERTIES.getProperty(URL) + boardId)
+            .request(Method.PUT, TEST_DATA_PROPERTIES.getProperty(URL) + boardId)
             .prettyPeek();
     }
 
     public Response sendRequestToDeleteBoard(String boardId) {
         return RestAssured
             .given(requestSpecification()).log().all()
-            .request(Method.DELETE, TESTDATA_PROPERTIES.getProperty(URL) + boardId)
+            .request(Method.DELETE, TEST_DATA_PROPERTIES.getProperty(URL) + boardId)
             .prettyPeek();
     }
 
