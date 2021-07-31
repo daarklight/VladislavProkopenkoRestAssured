@@ -6,8 +6,8 @@ import java.io.InputStream;
 import java.util.Properties;
 
 public class TrelloProperties {
-    protected static Properties testdataProperties = new Properties();
-    protected static Properties credentialProperties = new Properties();
+    public static Properties testdataProperties = new Properties();
+    public static Properties credentialProperties = new Properties();
 
     {
         final ClassLoader loader = getClass().getClassLoader();

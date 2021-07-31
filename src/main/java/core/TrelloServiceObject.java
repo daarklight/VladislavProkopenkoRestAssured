@@ -1,5 +1,7 @@
 package core;
 
+import static core.TrelloProperties.credentialProperties;
+import static core.TrelloProperties.testdataProperties;
 import static org.hamcrest.Matchers.lessThan;
 
 import beans.TrelloBoardResponse;
@@ -17,7 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.apache.http.HttpStatus;
 
-public class TrelloServiceObject extends TrelloProperties {
+public class TrelloServiceObject {
 
     private static final String TRELLO_KEY = "key";
     private static final String TRELLO_TOKEN = "token";

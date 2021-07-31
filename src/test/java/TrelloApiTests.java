@@ -11,13 +11,15 @@ import beans.TrelloBoardResponse;
 import core.TrelloProperties;
 import core.BoardsData;
 import java.util.List;
+import java.util.Properties;
 import org.hamcrest.Matchers;
 import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.testng.collections.Lists;
 
-public class TrelloApiTests extends TrelloProperties {
+public class TrelloApiTests {
 
     private static final String BOARD_NAME = "name";
     private static final String ERROR_MESSAGE = "errorMessage";
@@ -25,7 +27,14 @@ public class TrelloApiTests extends TrelloProperties {
     private static final String MISSING_RESOURCE_MESSAGE = "missingResourceMessage";
     private static final String PRIVATE_PERMISSION_LEVEL = "privatePermissionLevel";
 
-    private String boardId = null;
+    private String boardId;
+    private Properties testdataProperties;
+
+    @BeforeClass
+    public void setUp() {
+        TrelloProperties trelloProperties = new TrelloProperties();
+        testdataProperties = trelloProperties.testdataProperties;
+    }
 
     @BeforeMethod
     public void createBoard() {
@@ -80,7 +89,8 @@ public class TrelloApiTests extends TrelloProperties {
                 .then().assertThat()
                 .spec(badResponseSpecification())
                 .and()
-                .body(Matchers.allOf(containsString(testdataProperties.getProperty(INCORRECT_BACKGROUND_MESSAGE)),
+                .body(Matchers.allOf(
+                    containsString(testdataProperties.getProperty(INCORRECT_BACKGROUND_MESSAGE)),
                     containsString(testdataProperties.getProperty(ERROR_MESSAGE))))
                 .extract().response());
     }
